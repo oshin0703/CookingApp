@@ -1,0 +1,16 @@
+{
+  // Enable format on save for all languages but ensure Dart uses its own formatter
+  "editor.formatOnSave": true,
+  // For Dart/Flutter, use dart's built-in formatter (dart format) and organize imports on save
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  },
+  // Organize imports on save using the Dart extension
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  // Optional: save without prompting when files are created by formatter/organizer
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
