@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../components/basic_page.dart';
-import '../models/recipe_card_item.dart';
+import '../../models/recipe_card_item.dart';
 
-class RecipeDetailPage extends BasicPage {
-  final RecipeCardItem recipe;
-  const RecipeDetailPage({super.key, required this.recipe});
-
-  @override
-  String get barTitle => 'Cooking App';
+class RecipeDetailView extends StatelessWidget {
+  final RecipeInfo recipe;
+  const RecipeDetailView({super.key, required this.recipe});
 
   @override
-  Widget buildPage(BuildContext context) {
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -28,12 +24,12 @@ class RecipeDetailPage extends BasicPage {
                       width: constraints.maxWidth < 500 ? 120 : 220,
                       height: constraints.maxWidth < 500 ? 100 : 180,
                       decoration: BoxDecoration(
-                        color: recipe.backgroundColor,
+                        color: recipe.backgroundColor ?? Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Center(
                         child: Text(
-                          recipe.icon,
+                          recipe.icon ?? '',
                           style: TextStyle(
                             fontSize: constraints.maxWidth < 500 ? 32 : 64,
                           ),
@@ -56,7 +52,7 @@ class RecipeDetailPage extends BasicPage {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          recipe.description,
+                          recipe.description ?? '',
                           style: TextStyle(
                             fontSize: constraints.maxWidth < 500 ? 13 : 16,
                             color: Colors.grey,
@@ -66,10 +62,14 @@ class RecipeDetailPage extends BasicPage {
                         Wrap(
                           spacing: 24,
                           children: [
-                            _infoIconText(Icons.timer, recipe.time),
-                            _infoIconText(Icons.people, recipe.servings),
-                            _infoIconText(Icons.star, recipe.difficulty),
-                            _infoIconText(Icons.category, recipe.category),
+                            if (recipe.time != null)
+                              _infoIconText(Icons.timer, recipe.time!),
+                            if (recipe.servings != null)
+                              _infoIconText(Icons.people, recipe.servings!),
+                            if (recipe.difficulty != null)
+                              _infoIconText(Icons.star, recipe.difficulty!),
+                            if (recipe.category != null)
+                              _infoIconText(Icons.category, recipe.category!),
                           ],
                         ),
                       ],
@@ -95,24 +95,28 @@ class RecipeDetailPage extends BasicPage {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...recipe.ingredients.map(
-                      (i) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(i.name, style: const TextStyle(fontSize: 15)),
-                            Text(
-                              i.amount,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey,
+                    if (recipe.ingredients != null)
+                      ...recipe.ingredients!.map(
+                        (i) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                i.name,
+                                style: const TextStyle(fontSize: 15),
                               ),
-                            ),
-                          ],
+                              Text(
+                                i.amount,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

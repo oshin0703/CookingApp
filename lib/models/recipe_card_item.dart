@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
 
-class RecipeCardItem {
+class RecipeInfo {
+  final String? id;
   final String title;
-  final String description;
-  final String icon;
-  final Color backgroundColor;
-  final String imagePath;
-  final String time;
-  final String servings;
-  final String difficulty;
-  final String category;
-  final List<RecipeIngredient> ingredients;
-  final List<RecipeStep> steps;
+  final String? description;
+  final String? icon;
+  final Color? backgroundColor;
+  final String? imagePath;
+  final String? time;
+  final String? servings;
+  final String? difficulty;
+  final String? category;
+  final DateTime? date;
+  final List<RecipeIngredient>? ingredients;
+  final List<RecipeStep>? steps;
 
-  const RecipeCardItem({
+  const RecipeInfo({
+    this.id,
     required this.title,
-    required this.description,
-    required this.icon,
-    required this.backgroundColor,
-    required this.imagePath,
-    required this.time,
-    required this.servings,
-    required this.difficulty,
-    required this.category,
-    required this.ingredients,
-    required this.steps,
+    this.description,
+    this.icon,
+    this.backgroundColor,
+    this.imagePath,
+    this.time,
+    this.servings,
+    this.difficulty,
+    this.category,
+    this.date,
+    this.ingredients,
+    this.steps,
   });
 }
 

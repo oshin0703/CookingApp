@@ -2,15 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../models/recipe_card_item.dart';
+import '../../models/recipe_card_item.dart';
 
 class PageHorizontalList extends StatefulWidget {
-  final List<RecipeCardItem> items;
+  final List<RecipeInfo> items;
   final double desiredItemWidth;
   final double height;
   final double spacing;
   final double buttonWidth;
-  final void Function(RecipeCardItem)? onCardTap;
+  final void Function(RecipeInfo)? onCardTap;
 
   const PageHorizontalList({
     super.key,
@@ -103,9 +103,10 @@ class _PageHorizontalListState extends State<PageHorizontalList> {
                                   : null,
                               child: _buildCard(
                                 title: r.title,
-                                description: r.description,
-                                icon: r.icon,
-                                backgroundColor: r.backgroundColor,
+                                description: r.description ?? '',
+                                icon: r.icon ?? '',
+                                backgroundColor:
+                                    r.backgroundColor ?? Colors.grey.shade200,
                               ),
                             ),
                           );

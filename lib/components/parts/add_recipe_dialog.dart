@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AddRecipeDialog extends StatefulWidget {
-  const AddRecipeDialog({Key? key}) : super(key: key);
+  const AddRecipeDialog({super.key});
 
   @override
   State<AddRecipeDialog> createState() => _AddRecipeDialogState();
@@ -16,10 +16,10 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
   String _difficulty = '中級';
   String _category = 'メイン料理';
 
-  List<Map<String, String>> _ingredients = [
+  final List<Map<String, String>> _ingredients = [
     {'name': '', 'amount': ''},
   ];
-  List<Map<String, String>> _steps = [
+  final List<Map<String, String>> _steps = [
     {'title': '', 'desc': ''},
   ];
 
@@ -115,7 +115,7 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                         SizedBox(
                           width: 110,
                           child: DropdownButtonFormField<String>(
-                            value: _difficulty,
+                            initialValue: _difficulty,
                             items: ['初級', '中級', '上級']
                                 .map(
                                   (d) => DropdownMenuItem(
