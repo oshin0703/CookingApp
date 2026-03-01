@@ -6,6 +6,7 @@ class AddMealView extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController dateController;
   final String selectedCategory;
+  final VoidCallback onDateTap;
   final ValueChanged<String> onCategorySelected;
   final VoidCallback onSubmit;
   final VoidCallback onCancel;
@@ -15,6 +16,7 @@ class AddMealView extends StatelessWidget {
     required this.nameController,
     required this.dateController,
     required this.selectedCategory,
+    required this.onDateTap,
     required this.onCategorySelected,
     required this.onSubmit,
     required this.onCancel,
@@ -108,28 +110,33 @@ class AddMealView extends StatelessWidget {
           const SizedBox(height: 20),
           const Text('日付', style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          TextFormField(
-            controller: dateController,
-            readOnly: true,
-            decoration: InputDecoration(
-              suffixIcon: const Icon(
-                Icons.calendar_today,
-                color: Colors.grey,
-                size: 20,
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade50,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+          GestureDetector(
+            onTap: onDateTap,
+            child: AbsorbPointer(
+              child: TextFormField(
+                controller: dateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(
+                    Icons.calendar_today,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
               ),
             ),
           ),

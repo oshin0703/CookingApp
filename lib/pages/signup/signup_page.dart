@@ -48,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() => _isLoading = false);
       if (result != null) {
         if (mounted) {
-          Navigator.pop(context); // ログイン画面へ戻る（AuthWrapperが自動でHomePageに切り替えるはず）
+          Navigator.pop(context); // ログイン画面へ戻る
         }
       } else {
         if (mounted) {
@@ -56,23 +56,6 @@ class _SignUpPageState extends State<SignUpPage> {
             const SnackBar(content: Text('アカウント作成に失敗しました。既に登録されている可能性があります。')),
           );
         }
-      }
-    }
-  }
-
-  Future<void> _signUpWithGoogle() async {
-    setState(() => _isLoading = true);
-    final result = await _authService.signInWithGoogle();
-    setState(() => _isLoading = false);
-    if (result != null) {
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Googleログインに失敗しました。')));
       }
     }
   }
@@ -299,62 +282,6 @@ class _SignUpPageState extends State<SignUpPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        // Divider
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(color: Colors.grey.shade200),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Text(
-                                'または',
-                                style: TextStyle(
-                                  color: Colors.grey.shade400,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(color: Colors.grey.shade200),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        // Google Signup
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: OutlinedButton(
-                            onPressed: _isLoading ? null : _signUpWithGoogle,
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Colors.grey.shade200),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.network(
-                                  'https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png',
-                                  height: 24,
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Googleで登録',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                       ],

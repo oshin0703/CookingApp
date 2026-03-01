@@ -28,8 +28,13 @@ class HistoryPage extends BasicPage {
       Padding(
         padding: const EdgeInsets.only(right: 16.0),
         child: GestureDetector(
-          onTap: () {
-            BasicPage.push(context, const AddMealPage());
+          onTap: () async {
+            final result = await BasicPage.push(context, const AddMealPage());
+            if (result == true) {
+              if (context.mounted) {
+                Navigator.of(context).pop(true);
+              }
+            }
           },
           child: const CircleAvatar(
             backgroundColor: Colors.deepOrange,

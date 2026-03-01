@@ -4,34 +4,81 @@ import '../../components/parts/category_label.dart';
 import '../../models/recipe_card_item.dart';
 import '../../repositories/meal_history_repository.dart';
 
-class HistoryView extends StatelessWidget {
+class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<RecipeInfo>>(
-      future: MealHistoryRepository().fetchHistory(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('エラーが発生しました'));
-        }
+  State<HistoryView> createState() => _HistoryViewState();
+}
 
-        final list = snapshot.data ?? [];
-        return Container(
-          color: const Color(0xFFF5F5F5),
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            children: [
-              _HistoryHeader(totalCount: list.length),
-              const SizedBox(height: 32),
-              ..._buildHistoryList(list),
-            ],
+class _HistoryViewState extends State<HistoryView> {
+  final MealHistoryRepository _repository = MealHistoryRepository();
+  List<RecipeInfo>? _history;
+  bool _isLoading = true;
+  String? _error;
+  String _selectedCategory = 'すべて';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final history = await _repository.fetchHistory();
+      if (mounted) {
+        setState(() {
+          _history = history;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'エラーが発生しました';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(child: Text(_error!));
+    }
+
+    final fullList = _history ?? [];
+    final filteredList = _selectedCategory == 'すべて'
+        ? fullList
+        : fullList.where((item) => item.category == _selectedCategory).toList();
+
+    return Container(
+      color: const Color(0xFFF5F5F5),
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        children: [
+          _HistoryHeader(
+            totalCount: filteredList.length,
+            selectedCategory: _selectedCategory,
+            onCategoryChanged: (category) {
+              setState(() {
+                _selectedCategory = category;
+              });
+            },
           ),
-        );
-      },
+          const SizedBox(height: 32),
+          ..._buildHistoryList(filteredList),
+        ],
+      ),
     );
   }
 
@@ -55,7 +102,7 @@ class HistoryView extends StatelessWidget {
       } else if (diff == 1) {
         dateText = '昨日';
       } else {
-        dateText = '$diff日前';
+        dateText = '${date.month}月${date.day}日';
       }
 
       if (currentDate == null ||
@@ -81,38 +128,60 @@ class HistoryView extends StatelessWidget {
 
 class _HistoryHeader extends StatelessWidget {
   final int totalCount;
-  const _HistoryHeader({required this.totalCount});
+  final String selectedCategory;
+  final ValueChanged<String> onCategoryChanged;
+
+  const _HistoryHeader({
+    required this.totalCount,
+    required this.selectedCategory,
+    required this.onCategoryChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '全 $totalCount件',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '過去30日間',
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-            ),
           ],
         ),
-        const Row(
-          children: [
-            _FilterChip(label: 'すべて', isSelected: true),
-            SizedBox(width: 8),
-            _FilterChip(label: '和食', isSelected: false),
-            SizedBox(width: 8),
-            _FilterChip(label: '洋食', isSelected: false),
-            SizedBox(width: 8),
-            _FilterChip(label: '中華', isSelected: false),
-          ],
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _FilterChip(
+                label: 'すべて',
+                isSelected: selectedCategory == 'すべて',
+                onTap: () => onCategoryChanged('すべて'),
+              ),
+              const SizedBox(width: 8),
+              _FilterChip(
+                label: '和食',
+                isSelected: selectedCategory == '和食',
+                onTap: () => onCategoryChanged('和食'),
+              ),
+              const SizedBox(width: 8),
+              _FilterChip(
+                label: '洋食',
+                isSelected: selectedCategory == '洋食',
+                onTap: () => onCategoryChanged('洋食'),
+              ),
+              const SizedBox(width: 8),
+              _FilterChip(
+                label: '中華',
+                isSelected: selectedCategory == '中華',
+                onTap: () => onCategoryChanged('中華'),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -122,25 +191,34 @@ class _HistoryHeader extends StatelessWidget {
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;
-  const _FilterChip({required this.label, required this.isSelected});
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.deepOrange : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isSelected ? Colors.deepOrange : Colors.grey.shade300,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.deepOrange : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.deepOrange : Colors.grey.shade300,
+          ),
         ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.white : Colors.grey.shade700,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey.shade700,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -180,6 +258,7 @@ class _HistoryItemCard extends StatelessWidget {
     final date = item.date!;
     final isToday =
         date.year == now.year && date.month == now.month && date.day == now.day;
+    final monthString = '${date.month}/';
     final dayString = '${date.day}';
 
     // Simple weekday mapping
@@ -209,8 +288,8 @@ class _HistoryItemCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               color: isToday ? Colors.deepOrange : Colors.grey.shade500,
               borderRadius: BorderRadius.circular(8),
@@ -218,14 +297,29 @@ class _HistoryItemCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  dayString,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    height: 1.1,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      monthString,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.1,
+                      ),
+                    ),
+                    Text(
+                      dayString,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   weekdayString,
