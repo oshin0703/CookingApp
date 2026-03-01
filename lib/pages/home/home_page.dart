@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../components/pages/basic_page.dart';
+import '../../services/auth_service.dart';
 import '../history/history_page.dart';
 import 'home_view.dart';
 
@@ -46,6 +47,36 @@ class HomePage extends BasicPage {
             fontSize: 16,
           ),
         ),
+      ),
+      IconButton(
+        onPressed: () async {
+          final result = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('ログアウト'),
+              content: const Text('ログアウトしますか？'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('キャンセル'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text(
+                    'ログアウト',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (result == true) {
+            await AuthService().signOut();
+          }
+        },
+        icon: const Icon(Icons.logout, color: Colors.grey),
+        tooltip: 'ログアウト',
       ),
       const SizedBox(width: 8),
     ];
